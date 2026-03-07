@@ -65,7 +65,7 @@ export default function CreatePost({ onCreated, groupId }: Props) {
         <Avatar user={user} size={40} />
         <button
           onClick={() => { setOpen(true); setTimeout(() => taRef.current?.focus(), 50); }}
-          className="flex-1 text-left bg-[#13161e] border border-[#232736] hover:border-[#2e3347] rounded-xl px-4 py-2.5 text-sm text-[#6b7280] transition-all"
+          className="flex-1 text-left bg-[var(--nx-surface)] border border-[var(--nx-border)] hover:border-[var(--nx-border-2)] rounded-xl px-4 py-2.5 text-sm text-[var(--nx-muted)] transition-all"
         >
           What's on your mind, {user?.firstName}?
         </button>
@@ -79,7 +79,7 @@ export default function CreatePost({ onCreated, groupId }: Props) {
             onChange={e => setContent(e.target.value)}
             placeholder={`What's on your mind, ${user?.firstName}?`}
             rows={3}
-            className="w-full bg-transparent border-none outline-none text-[#e8eaf0] placeholder-[#6b7280] text-base resize-none leading-relaxed"
+            className="w-full bg-transparent border-none outline-none text-[var(--nx-text)] placeholder-[var(--nx-muted)] text-base resize-none leading-relaxed"
           />
 
           {/* Media previews */}
@@ -103,23 +103,23 @@ export default function CreatePost({ onCreated, groupId }: Props) {
           )}
 
           {/* Bottom bar */}
-          <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#232736]">
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-[var(--nx-border)]">
             <div className="flex items-center gap-1">
               <button
                 onClick={() => fileRef.current?.click()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[#00d4b4] hover:bg-[rgba(0,212,180,0.08)] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-[#7c6ff7] hover:bg-[rgba(124,111,247,0.08)] transition-colors"
               >
                 <ImageIcon size={15} /> Photo
               </button>
               <input ref={fileRef} type="file" accept="image/*,video/*" multiple onChange={addFiles} className="hidden" />
 
               {/* Privacy select */}
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[#9ca3af]">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-[var(--nx-subtle)]">
                 <PrivIcon size={13} />
                 <select
                   value={privacy}
                   onChange={e => setPrivacy(e.target.value as typeof privacy)}
-                  className="bg-transparent border-none outline-none text-sm text-[#9ca3af] cursor-pointer"
+                  className="bg-transparent border-none outline-none text-sm text-[var(--nx-subtle)] cursor-pointer"
                 >
                   {privacyOptions.map(o => <option key={o.v} value={o.v}>{o.label}</option>)}
                 </select>
@@ -149,10 +149,10 @@ export default function CreatePost({ onCreated, groupId }: Props) {
 
       {/* Collapsed action bar */}
       {!open && (
-        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-[#232736]">
+        <div className="flex items-center gap-1 mt-3 pt-3 border-t border-[var(--nx-border)]">
           <button
             onClick={() => { setOpen(true); setTimeout(() => fileRef.current?.click(), 100); }}
-            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium text-[#00d4b4] hover:bg-[rgba(0,212,180,0.06)] transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-medium text-[#7c6ff7] hover:bg-[rgba(124,111,247,0.06)] transition-colors"
           >
             <ImageIcon size={16} /> Photo / Video
           </button>

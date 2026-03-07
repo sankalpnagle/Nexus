@@ -7,6 +7,10 @@ import { Avatar } from '../ui';
 import { getAvatar } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
+const A = '#7c6ff7';
+const B = 'var(--nx-border)';
+const M = 'var(--nx-muted)';
+
 export default function RightSidebar() {
   const [suggestions, setSuggestions] = useState<User[]>([]);
   const nav = useNavigate();
@@ -28,15 +32,17 @@ export default function RightSidebar() {
   return (
     <aside className="w-64 shrink-0 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto py-4 px-2 hidden xl:block">
       <div className="flex items-center gap-2 px-2 mb-3">
-        <Sparkles size={13} className="text-[#00d4b4]" />
-        <p className="text-[10px] font-bold text-[#6b7280] uppercase tracking-wider">People You May Know</p>
+        <Sparkles size={13} style={{ color: A }} />
+        <p className="text-[10px] font-bold uppercase tracking-wider" style={{ color: M }}>People You May Know</p>
       </div>
 
       <div className="space-y-1">
         {suggestions.map(u => (
           <div
             key={u._id}
-            className="flex items-center gap-2.5 px-2 py-2.5 rounded-xl hover:bg-[#181c26] transition-colors group"
+            className="flex items-center gap-2.5 px-2 py-2.5 rounded-xl transition-colors group"
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--nx-card)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
           >
             <img
               src={getAvatar(u, 72)}
@@ -48,14 +54,17 @@ export default function RightSidebar() {
               className="flex-1 min-w-0 cursor-pointer"
               onClick={() => nav(`/profile/${u._id}`)}
             >
-              <p className="text-sm font-semibold text-[#e8eaf0] truncate">
+              <p className="text-sm font-semibold truncate" style={{ color: 'var(--nx-text)' }}>
                 {u.firstName} {u.lastName}
               </p>
-              <p className="text-xs text-[#6b7280]">{(u.friends as string[]).length} mutual friends</p>
+              <p className="text-xs" style={{ color: M }}>{(u.friends as string[]).length} mutual</p>
             </div>
             <button
               onClick={() => add(u._id)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 flex items-center justify-center rounded-lg bg-[rgba(0,212,180,0.1)] text-[#00d4b4] hover:bg-[#00d4b4] hover:text-[#0d0f14]"
+              className="opacity-0 group-hover:opacity-100 transition-opacity w-7 h-7 flex items-center justify-center rounded-lg"
+              style={{ background: 'rgba(124,111,247,0.12)', color: A }}
+              onMouseEnter={e => { (e.currentTarget.style.background = A); (e.currentTarget.style.color = '#fff'); }}
+              onMouseLeave={e => { (e.currentTarget.style.background = 'rgba(124,111,247,0.12)'); (e.currentTarget.style.color = A); }}
             >
               <UserPlus size={13} />
             </button>

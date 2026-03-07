@@ -90,7 +90,7 @@ export default function GroupsPage() {
     const member = isMember(g);
     const admin  = isAdmin(g);
     return (
-      <Card className="overflow-hidden hover:border-[#2e3347] transition-colors group">
+      <Card className="overflow-hidden hover:border-[var(--nx-border-2)] transition-colors group">
         <div className="relative">
           <img
             src={g.cover || getGroupAvatar(g.name, 600)}
@@ -102,8 +102,8 @@ export default function GroupsPage() {
             <span className={cx(
               'inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full',
               g.privacy === 'public'
-                ? 'bg-emerald-500/20 text-emerald-400'
-                : 'bg-[#6b7280]/20 text-[#9ca3af]'
+                ? 'bg-emerald-500/20 text-[#10d98a]'
+                : 'bg-[var(--nx-muted)]/20 text-[var(--nx-subtle)]'
             )}>
               {g.privacy === 'public' ? <Globe size={9} /> : <Lock size={9} />}
               {g.privacy}
@@ -111,7 +111,7 @@ export default function GroupsPage() {
           </div>
           {admin && (
             <div className="absolute top-2 left-2">
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-[#00d4b4]/20 text-[#00d4b4]">
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-[#7c6ff7]/20 text-[#7c6ff7]">
                 <Crown size={9} /> Admin
               </span>
             </div>
@@ -119,12 +119,12 @@ export default function GroupsPage() {
         </div>
         <div className="p-3.5">
           <p
-            className="font-bold text-[#f4f6fc] text-sm cursor-pointer hover:text-[#00d4b4] transition-colors truncate font-[var(--font-display)]"
+            className="font-bold text-[var(--nx-heading)] text-sm cursor-pointer hover:text-[#7c6ff7] transition-colors truncate font-[var(--font-display)]"
             onClick={() => nav(`/groups/${g._id}`)}
           >
             {g.name}
           </p>
-          <div className="flex items-center gap-3 text-xs text-[#6b7280] mt-1 mb-3">
+          <div className="flex items-center gap-3 text-xs text-[var(--nx-muted)] mt-1 mb-3">
             <span className="flex items-center gap-1"><Users size={10} /> {(g.members as unknown[]).length} members</span>
             <span className="flex items-center gap-1"><Grid3x3 size={10} /> {g.category}</span>
           </div>
@@ -158,7 +158,7 @@ export default function GroupsPage() {
   return (
     <div className="max-w-[1100px] mx-auto px-4 py-5">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-black text-[#f4f6fc] font-[var(--font-display)] tracking-tight">Groups</h1>
+        <h1 className="text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">Groups</h1>
         <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={() => setShowCreate(true)}>
           Create Group
         </Button>
@@ -176,13 +176,13 @@ export default function GroupsPage() {
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3 mb-5">
             <div className="relative flex-1">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7280]" />
+              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--nx-muted)]" />
               <input
                 type="text"
                 placeholder="Search groups…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-2 bg-[#13161e] border border-[#232736] rounded-xl text-sm text-[#e8eaf0] placeholder-[#6b7280] focus:outline-none focus:border-[#00d4b4] transition-colors"
+                className="w-full pl-8 pr-3 py-2 bg-[var(--nx-surface)] border border-[var(--nx-border)] rounded-xl text-sm text-[var(--nx-text)] placeholder-[var(--nx-muted)] focus:outline-none focus:border-[#7c6ff7] transition-colors"
               />
             </div>
             <div className="flex gap-1.5 flex-wrap">
@@ -193,8 +193,8 @@ export default function GroupsPage() {
                   className={cx(
                     'px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
                     category === cat
-                      ? 'bg-[#00d4b4] text-[#0d0f14] font-bold'
-                      : 'bg-[#181c26] border border-[#232736] text-[#9ca3af] hover:border-[#2e3347]'
+                      ? 'bg-[#7c6ff7] text-[var(--nx-bg)] font-bold'
+                      : 'bg-[var(--nx-card)] border border-[var(--nx-border)] text-[var(--nx-subtle)] hover:border-[var(--nx-border-2)]'
                   )}
                 >
                   {cat}
@@ -247,22 +247,22 @@ export default function GroupsPage() {
           />
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#6b7280] uppercase tracking-wider mb-1.5">Privacy</label>
+              <label className="block text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5">Privacy</label>
               <select
                 value={form.privacy}
                 onChange={e => setForm(f => ({ ...f, privacy: e.target.value }))}
-                className="w-full bg-[#13161e] border border-[#232736] text-[#e8eaf0] rounded-xl text-sm px-3.5 py-2.5 focus:outline-none focus:border-[#00d4b4]"
+                className="w-full bg-[var(--nx-surface)] border border-[var(--nx-border)] text-[var(--nx-text)] rounded-xl text-sm px-3.5 py-2.5 focus:outline-none focus:border-[#7c6ff7]"
               >
                 <option value="public">🌍 Public</option>
                 <option value="private">🔒 Private</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#6b7280] uppercase tracking-wider mb-1.5">Category</label>
+              <label className="block text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5">Category</label>
               <select
                 value={form.category}
                 onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                className="w-full bg-[#13161e] border border-[#232736] text-[#e8eaf0] rounded-xl text-sm px-3.5 py-2.5 focus:outline-none focus:border-[#00d4b4]"
+                className="w-full bg-[var(--nx-surface)] border border-[var(--nx-border)] text-[var(--nx-text)] rounded-xl text-sm px-3.5 py-2.5 focus:outline-none focus:border-[#7c6ff7]"
               >
                 {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
               </select>

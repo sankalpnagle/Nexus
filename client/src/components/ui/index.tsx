@@ -24,7 +24,7 @@ export const Avatar = ({ user, size = 40, online, className, onClick }: AvatarPr
     />
     {online && (
       <span
-        className="absolute bottom-0 right-0 rounded-full bg-emerald-400 border-2 border-[#0d0f14] online-pulse"
+        className="absolute bottom-0 right-0 rounded-full bg-[#10d98a] border-2 border-[var(--nx-bg)] online-pulse"
         style={{ width: Math.max(10, size * 0.22), height: Math.max(10, size * 0.22) }}
       />
     )}
@@ -36,11 +36,11 @@ type BtnVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
 type BtnSize = 'xs' | 'sm' | 'md' | 'lg';
 
 const btnVariant: Record<BtnVariant, string> = {
-  primary:   'bg-[#00d4b4] text-[#0d0f14] hover:bg-[#00b89c] font-bold shadow-[0_0_20px_rgba(0,212,180,0.2)]',
-  secondary: 'bg-[#232736] text-[#e8eaf0] hover:bg-[#2e3347] border border-[#2e3347]',
-  ghost:     'text-[#9ca3af] hover:text-[#e8eaf0] hover:bg-[#181c26]',
-  danger:    'bg-[#f43f5e] text-white hover:bg-[#e11d48]',
-  outline:   'border border-[#2e3347] text-[#e8eaf0] hover:border-[#00d4b4] hover:text-[#00d4b4] bg-transparent',
+  primary:   'bg-[#7c6ff7] text-[var(--nx-bg)] hover:bg-[#6459e0] font-bold shadow-[0_0_20px_rgba(124,111,247,0.2)]',
+  secondary: 'bg-[var(--nx-card)] text-[var(--nx-text)] hover:bg-[var(--nx-hover)] border border-[var(--nx-border)]',
+  ghost:     'text-[var(--nx-subtle)] hover:text-[var(--nx-text)] hover:bg-[var(--nx-hover)]',
+  danger:    'bg-[#fb4570] text-white hover:bg-[#e11d48]',
+  outline:   'border border-[var(--nx-border-2)] text-[var(--nx-text)] hover:border-[#7c6ff7] hover:text-[#7c6ff7] bg-transparent',
 };
 const btnSize: Record<BtnSize, string> = {
   xs: 'px-2.5 py-1 text-xs rounded-lg',
@@ -80,7 +80,7 @@ export const Button = ({
 
 // ─── Card ──────────────────────────────────────────────────────────────────
 export const Card = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={cx('bg-[#181c26] border border-[#232736] rounded-2xl', className)}>
+  <div className={cx('rounded-2xl', className)} style={{ background:'var(--nx-card)', border:'1px solid var(--nx-border)' }}>
     {children}
   </div>
 );
@@ -94,28 +94,29 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = ({ label, error, icon, className, ...rest }: InputProps) => (
   <div className="w-full">
     {label && (
-      <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1.5 font-[var(--font-display)]">
+      <label className="block text-xs font-semibold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5 font-[var(--font-display)]">
         {label}
       </label>
     )}
     <div className="relative">
       {icon && (
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7280] pointer-events-none">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--nx-muted)] pointer-events-none">
           {icon}
         </span>
       )}
       <input
         {...rest}
+        style={{ background:'var(--nx-input)' }}
         className={cx(
-          'w-full bg-[#13161e] border border-[#232736] text-[#e8eaf0] placeholder-[#6b7280] rounded-xl text-sm transition-all',
-          'focus:outline-none focus:border-[#00d4b4] focus:ring-1 focus:ring-[rgba(0,212,180,0.3)]',
+          'w-full border border-[var(--nx-border)] text-[var(--nx-text)] placeholder-[var(--nx-muted)] rounded-xl text-sm transition-all',
+          'focus:outline-none focus:border-[#7c6ff7] focus:ring-1 focus:ring-[rgba(124,111,247,0.3)]',
           icon ? 'pl-9 pr-3.5 py-2.5' : 'px-3.5 py-2.5',
-          error && 'border-[#f43f5e]',
+          error && 'border-[#fb4570]',
           className
         )}
       />
     </div>
-    {error && <p className="mt-1 text-xs text-[#f43f5e]">{error}</p>}
+    {error && <p className="mt-1 text-xs text-[#fb4570]">{error}</p>}
   </div>
 );
 
@@ -126,15 +127,16 @@ interface TAProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
 export const Textarea = ({ label, className, ...rest }: TAProps) => (
   <div className="w-full">
     {label && (
-      <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1.5 font-[var(--font-display)]">
+      <label className="block text-xs font-semibold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5 font-[var(--font-display)]">
         {label}
       </label>
     )}
     <textarea
       {...rest}
+      style={{ background:'var(--nx-input)' }}
       className={cx(
-        'w-full bg-[#13161e] border border-[#232736] text-[#e8eaf0] placeholder-[#6b7280] rounded-xl text-sm transition-all resize-none',
-        'focus:outline-none focus:border-[#00d4b4] focus:ring-1 focus:ring-[rgba(0,212,180,0.3)]',
+        'w-full border border-[var(--nx-border)] text-[var(--nx-text)] placeholder-[var(--nx-muted)] rounded-xl text-sm transition-all resize-none',
+        'focus:outline-none focus:border-[#7c6ff7] focus:ring-1 focus:ring-[rgba(124,111,247,0.3)]',
         'px-3.5 py-2.5',
         className
       )}
@@ -145,7 +147,7 @@ export const Textarea = ({ label, className, ...rest }: TAProps) => (
 // ─── Spinner ───────────────────────────────────────────────────────────────
 export const Spinner = ({ size = 32, className }: { size?: number; className?: string }) => (
   <div
-    className={cx('border-2 border-[#232736] border-t-[#00d4b4] rounded-full animate-spin', className)}
+    className={cx('border-2 border-[var(--nx-border)] border-t-[#7c6ff7] rounded-full animate-spin', className)}
     style={{ width: size, height: size }}
   />
 );
@@ -158,7 +160,7 @@ export const Badge = ({
   count > 0 ? (
     <span
       className={cx(
-        'absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-[#f43f5e] text-white text-[10px] font-bold',
+        'absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-[#fb4570] text-white text-[10px] font-bold',
         className
       )}
     >
@@ -182,15 +184,15 @@ export const Modal = ({ open, onClose, title, children, maxWidth = 'max-w-lg' }:
       onClick={onClose}
     >
       <div
-        className={cx('bg-[#13161e] border border-[#2e3347] rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-auto animate-fade-in', maxWidth)}
+        className={cx('rounded-2xl shadow-2xl w-full max-h-[90vh] overflow-auto animate-fade-in', maxWidth)} style={{ background:'var(--nx-surface)', border:'1px solid var(--nx-border-2)' }}
         onClick={e => e.stopPropagation()}
       >
         {title && (
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[#232736]">
-            <h2 className="text-base font-bold text-[#f4f6fc] font-[var(--font-display)]">{title}</h2>
+          <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom:'1px solid var(--nx-border)' }}>
+            <h2 className="text-base font-bold text-[var(--nx-heading)] font-[var(--font-display)]">{title}</h2>
             <button
               onClick={onClose}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-[#6b7280] hover:text-[#e8eaf0] hover:bg-[#232736] text-xl leading-none transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--nx-muted)] hover:text-[var(--nx-text)] hover:bg-[var(--nx-border)] text-xl leading-none transition-colors"
             >
               ×
             </button>
@@ -207,17 +209,17 @@ export const EmptyState = ({
   icon, title, subtitle,
 }: { icon: React.ReactNode; title: string; subtitle?: string }) => (
   <div className="flex flex-col items-center justify-center py-16 text-center">
-    <div className="w-16 h-16 rounded-2xl bg-[#181c26] border border-[#232736] flex items-center justify-center text-[#6b7280] mb-4">
+    <div className="w-16 h-16 rounded-2xl border flex items-center justify-center text-[var(--nx-muted)] mb-4" style={{ background:'var(--nx-card)', border:'1px solid var(--nx-border)' }}>
       {icon}
     </div>
-    <p className="font-semibold text-[#9ca3af] mb-1 font-[var(--font-display)]">{title}</p>
-    {subtitle && <p className="text-sm text-[#6b7280] max-w-xs">{subtitle}</p>}
+    <p className="font-semibold text-[var(--nx-subtle)] mb-1 font-[var(--font-display)]">{title}</p>
+    {subtitle && <p className="text-sm text-[var(--nx-muted)] max-w-xs">{subtitle}</p>}
   </div>
 );
 
 // ─── Divider ───────────────────────────────────────────────────────────────
 export const Divider = ({ className }: { className?: string }) => (
-  <hr className={cx('border-[#232736]', className)} />
+  <hr className={cx('border-[var(--nx-border)]', className)} />
 );
 
 // ─── Tab Bar ───────────────────────────────────────────────────────────────
@@ -229,7 +231,7 @@ interface TabsProps<T extends string> {
 }
 export function Tabs<T extends string>({ tabs, active, onChange, className }: TabsProps<T>) {
   return (
-    <div className={cx('flex items-center gap-1 p-1 bg-[#13161e] rounded-xl border border-[#232736]', className)}>
+    <div className={cx('flex items-center gap-1 p-1 rounded-xl', className)} style={{ background:'var(--nx-surface)', border:'1px solid var(--nx-border)' }}>
       {tabs.map(({ key, label, count }) => (
         <button
           key={key}
@@ -237,15 +239,15 @@ export function Tabs<T extends string>({ tabs, active, onChange, className }: Ta
           className={cx(
             'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex-1 justify-center',
             active === key
-              ? 'bg-[#00d4b4] text-[#0d0f14] font-bold'
-              : 'text-[#6b7280] hover:text-[#e8eaf0] hover:bg-[#181c26]'
+              ? 'bg-[#7c6ff7] text-[var(--nx-bg)] font-bold'
+              : 'text-[var(--nx-muted)] hover:text-[var(--nx-text)] hover:bg-[var(--nx-card)]'
           )}
         >
           {label}
           {count !== undefined && count > 0 && (
             <span className={cx(
               'text-[10px] font-bold min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center',
-              active === key ? 'bg-[#0d0f14]/30 text-[#0d0f14]' : 'bg-[#f43f5e] text-white'
+              active === key ? 'bg-[var(--nx-bg)]/30 text-[var(--nx-bg)]' : 'bg-[#fb4570] text-white'
             )}>
               {count}
             </span>

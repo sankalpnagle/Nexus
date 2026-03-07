@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../store/authStore';
 import { useSocket } from '../store/socketStore';
+import { useLocation } from 'react-router-dom';
 import api from '../utils/api';
 import { Conversation, Message, User } from '../types';
 import { Avatar, Button, Input, Modal, Spinner } from '../components/ui';
@@ -22,6 +23,7 @@ const fmtTime = (d: string) => {
 export default function MessagesPage() {
   const { user: me } = useAuth();
   const { socket, online } = useSocket();
+  const location = useLocation();
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [selected, setSelected] = useState<Conversation | null>(null);
   const [msgs, setMsgs] = useState<Message[]>([]);
@@ -39,6 +41,15 @@ export default function MessagesPage() {
   const typingRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => { fetchConvs(); fetchFriends(); }, []);
+
+  // Auto-open DM if navigated here from sidebar
+  useEffect(() => {
+    const state = (location.state || {}) as { openDm?: string };
+    if (state.openDm) {
+      startDM(state.openDm);
+      window.history.replaceState({}, '');
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (!selected) return;
@@ -131,16 +142,16 @@ export default function MessagesPage() {
   const selectConv = (c: Conversation) => { setSelected(c); setShowPanel('chat'); };
 
   return (
-    <div className="flex h-[calc(100vh-56px)] max-w-[1100px] mx-auto border-x border-[#232736]">
+    <div className="flex h-[calc(100vh-56px)] max-w-[1100px] mx-auto border-x border-[var(--nx-border)]">
 
       {/* Conversation list */}
       <div className={cx(
-        'w-full md:w-80 flex flex-col border-r border-[#232736] bg-[#13161e] shrink-0',
+        'w-full md:w-80 flex flex-col border-r border-[var(--nx-border)] bg-[var(--nx-surface)] shrink-0',
         'md:flex', showPanel === 'chat' ? 'hidden' : 'flex'
       )}>
-        <div className="p-4 border-b border-[#232736]">
+        <div className="p-4 border-b border-[var(--nx-border)]">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-black text-[#f4f6fc] font-[var(--font-display)]">Messages</h2>
+            <h2 className="text-lg font-black text-[var(--nx-heading)] font-[var(--font-display)]">Messages</h2>
             <div className="flex items-center gap-1">
               <Button variant="ghost" size="xs" icon={<Users size={14} />} onClick={() => setShowGroup(true)}>
                 Group
@@ -148,29 +159,29 @@ export default function MessagesPage() {
             </div>
           </div>
           <div className="relative">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6b7280]" />
+            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--nx-muted)]" />
             <input
               type="text"
               placeholder="Search messages…"
               value={searchQ}
               onChange={e => setSearchQ(e.target.value)}
-              className="w-full pl-8 pr-3 py-2 bg-[#181c26] border border-[#232736] rounded-xl text-sm text-[#e8eaf0] placeholder-[#6b7280] focus:outline-none focus:border-[#00d4b4] transition-colors"
+              className="w-full pl-8 pr-3 py-2 bg-[var(--nx-card)] border border-[var(--nx-border)] rounded-xl text-sm text-[var(--nx-text)] placeholder-[var(--nx-muted)] focus:outline-none focus:border-[#7c6ff7] transition-colors"
             />
           </div>
         </div>
 
         {/* People results when searching */}
         {searchQ && filteredFriends.length > 0 && (
-          <div className="border-b border-[#232736]">
-            <p className="px-4 py-1.5 text-[9px] font-bold text-[#6b7280] uppercase tracking-widest">People</p>
+          <div className="border-b border-[var(--nx-border)]">
+            <p className="px-4 py-1.5 text-[9px] font-bold text-[var(--nx-muted)] uppercase tracking-widest">People</p>
             {filteredFriends.slice(0, 4).map(f => (
               <div
                 key={(f as User)._id}
                 onClick={() => startDM((f as User)._id)}
-                className="flex items-center gap-3 px-4 py-3 hover:bg-[#181c26] cursor-pointer transition-colors"
+                className="flex items-center gap-3 px-4 py-3 hover:bg-[var(--nx-card)] cursor-pointer transition-colors"
               >
                 <Avatar user={f as User} size={38} online={online[(f as User)._id] || (f as User).isOnline} />
-                <p className="text-sm font-semibold text-[#e8eaf0]">{(f as User).firstName} {(f as User).lastName}</p>
+                <p className="text-sm font-semibold text-[var(--nx-text)]">{(f as User).firstName} {(f as User).lastName}</p>
               </div>
             ))}
           </div>
@@ -182,8 +193,8 @@ export default function MessagesPage() {
             <div className="flex justify-center py-10"><Spinner /></div>
           ) : filteredConvs.length === 0 ? (
             <div className="text-center py-10 px-4">
-              <p className="text-sm text-[#6b7280]">No conversations yet</p>
-              <p className="text-xs text-[#6b7280] mt-1">Search for a friend to start chatting</p>
+              <p className="text-sm text-[var(--nx-muted)]">No conversations yet</p>
+              <p className="text-xs text-[var(--nx-muted)] mt-1">Search for a friend to start chatting</p>
             </div>
           ) : filteredConvs.map(c => (
             <div
@@ -191,7 +202,7 @@ export default function MessagesPage() {
               onClick={() => selectConv(c)}
               className={cx(
                 'flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors border-b border-[#1a1d27]',
-                selected?._id === c._id ? 'bg-[rgba(0,212,180,0.06)]' : 'hover:bg-[#181c26]'
+                selected?._id === c._id ? 'bg-[rgba(124,111,247,0.06)]' : 'hover:bg-[var(--nx-card)]'
               )}
             >
               <div className="relative shrink-0">
@@ -205,13 +216,13 @@ export default function MessagesPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <p className="font-bold text-sm text-[#f4f6fc] truncate font-[var(--font-display)]">{convName(c)}</p>
+                  <p className="font-bold text-sm text-[var(--nx-heading)] truncate font-[var(--font-display)]">{convName(c)}</p>
                   {c.lastMessage && (
-                    <span className="text-[10px] text-[#6b7280] shrink-0 ml-1">{timeAgo(c.lastMessage.createdAt)}</span>
+                    <span className="text-[10px] text-[var(--nx-muted)] shrink-0 ml-1">{timeAgo(c.lastMessage.createdAt)}</span>
                   )}
                 </div>
                 {c.lastMessage && (
-                  <p className="text-xs text-[#6b7280] truncate mt-0.5">
+                  <p className="text-xs text-[var(--nx-muted)] truncate mt-0.5">
                     {(c.lastMessage as Message).content || '📎 Media'}
                   </p>
                 )}
@@ -229,11 +240,11 @@ export default function MessagesPage() {
         {selected ? (
           <>
             {/* Chat header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#232736] bg-[#13161e] shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--nx-border)] bg-[var(--nx-surface)] shrink-0">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setShowPanel('list')}
-                  className="md:hidden text-[#6b7280] hover:text-[#e8eaf0] transition-colors mr-1"
+                  className="md:hidden text-[var(--nx-muted)] hover:text-[var(--nx-text)] transition-colors mr-1"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -245,18 +256,18 @@ export default function MessagesPage() {
                   <Avatar user={otherUser(selected)} size={36} online={isOnlineConv(selected)} />
                 )}
                 <div>
-                  <p className="font-bold text-[#f4f6fc] text-sm font-[var(--font-display)]">{convName(selected)}</p>
-                  <p className="text-xs text-[#6b7280]">
+                  <p className="font-bold text-[var(--nx-heading)] text-sm font-[var(--font-display)]">{convName(selected)}</p>
+                  <p className="text-xs text-[var(--nx-muted)]">
                     {isOnlineConv(selected) ? (
-                      <span className="text-emerald-400">● Active now</span>
+                      <span className="text-[#10d98a]">● Active now</span>
                     ) : 'Offline'}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-0.5">
-                <button className="w-8 h-8 flex items-center justify-center rounded-xl text-[#6b7280] hover:bg-[#232736] hover:text-[#e8eaf0] transition-colors"><Phone size={15} /></button>
-                <button className="w-8 h-8 flex items-center justify-center rounded-xl text-[#6b7280] hover:bg-[#232736] hover:text-[#e8eaf0] transition-colors"><Video size={15} /></button>
-                <button className="w-8 h-8 flex items-center justify-center rounded-xl text-[#6b7280] hover:bg-[#232736] hover:text-[#e8eaf0] transition-colors"><Info size={15} /></button>
+                <button className="w-8 h-8 flex items-center justify-center rounded-xl text-[var(--nx-muted)] hover:bg-[var(--nx-border)] hover:text-[var(--nx-text)] transition-colors"><Phone size={15} /></button>
+                <button className="w-8 h-8 flex items-center justify-center rounded-xl text-[var(--nx-muted)] hover:bg-[var(--nx-border)] hover:text-[var(--nx-text)] transition-colors"><Video size={15} /></button>
+                <button className="w-8 h-8 flex items-center justify-center rounded-xl text-[var(--nx-muted)] hover:bg-[var(--nx-border)] hover:text-[var(--nx-text)] transition-colors"><Info size={15} /></button>
               </div>
             </div>
 
@@ -271,7 +282,7 @@ export default function MessagesPage() {
                 return (
                   <div key={m._id}>
                     {showTime && (
-                      <p className="text-center text-[10px] text-[#6b7280] my-3">{fmtTime(m.createdAt)}</p>
+                      <p className="text-center text-[10px] text-[var(--nx-muted)] my-3">{fmtTime(m.createdAt)}</p>
                     )}
                     <div className={cx('flex items-end gap-2', isMe ? 'justify-end' : 'justify-start')}>
                       {!isMe && (
@@ -283,23 +294,25 @@ export default function MessagesPage() {
                       )}
                       <div className={cx('flex flex-col gap-0.5 max-w-[65%]', isMe ? 'items-end' : 'items-start')}>
                         {!isMe && !sameAuthor && (
-                          <p className="text-[10px] text-[#6b7280] px-1">{m.sender.firstName}</p>
+                          <p className="text-[10px] text-[var(--nx-muted)] px-1">{m.sender.firstName}</p>
                         )}
                         {m.media && (
                           <img src={m.media.url} alt="" className={cx('rounded-2xl max-w-[220px]', isMe ? 'rounded-br-sm' : 'rounded-bl-sm')} />
                         )}
                         {m.content && (
-                          <div className={cx(
-                            'px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed',
-                            isMe
-                              ? 'bg-[#00d4b4] text-[#0d0f14] rounded-br-sm font-medium'
-                              : 'bg-[#232736] text-[#e8eaf0] rounded-bl-sm'
-                          )}>
+                          <div
+                            className="px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed"
+                            style={{
+                              background: isMe ? '#7c6ff7' : 'var(--nx-msg-bg)',
+                              color: isMe ? '#fff' : 'var(--nx-msg-fg)',
+                              borderRadius: isMe ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                              fontWeight: isMe ? 500 : 400,
+                            }}>
                             {m.content}
                           </div>
                         )}
                         {i === msgs.length - 1 && isMe && (
-                          <span className="text-[10px] text-[#6b7280] px-1">
+                          <span className="text-[10px] text-[var(--nx-muted)] px-1">
                             {format(new Date(m.createdAt), 'HH:mm')}
                           </span>
                         )}
@@ -312,28 +325,28 @@ export default function MessagesPage() {
               {/* Typing indicator */}
               {typingUser && (
                 <div className="flex items-center gap-2 mt-2">
-                  <div className="bg-[#232736] rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
+                  <div className="bg-[var(--nx-border)] rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
                     {[0, 1, 2].map(i => (
                       <span
                         key={i}
-                        className="w-1.5 h-1.5 rounded-full bg-[#6b7280]"
+                        className="w-1.5 h-1.5 rounded-full bg-[var(--nx-muted)]"
                         style={{ animation: `dot-bounce 1.2s ${i * 0.2}s infinite ease-in-out` }}
                       />
                     ))}
                   </div>
-                  <span className="text-xs text-[#6b7280]">{typingUser} is typing…</span>
+                  <span className="text-xs text-[var(--nx-muted)]">{typingUser} is typing…</span>
                 </div>
               )}
               <div ref={endRef} />
             </div>
 
             {/* Message input */}
-            <div className="px-4 py-3 border-t border-[#232736] bg-[#13161e] shrink-0">
+            <div className="px-4 py-3 border-t border-[var(--nx-border)] bg-[var(--nx-surface)] shrink-0">
               <form onSubmit={send} className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="w-9 h-9 flex items-center justify-center rounded-xl text-[#6b7280] hover:bg-[#232736] hover:text-[#00d4b4] transition-colors shrink-0"
+                  className="w-9 h-9 flex items-center justify-center rounded-xl text-[var(--nx-muted)] hover:bg-[var(--nx-border)] hover:text-[#7c6ff7] transition-colors shrink-0"
                 >
                   <ImageIcon size={18} />
                 </button>
@@ -353,13 +366,13 @@ export default function MessagesPage() {
                     } catch { toast.error('Failed to send'); }
                   }}
                 />
-                <div className="flex-1 flex items-center bg-[#181c26] border border-[#232736] focus-within:border-[#00d4b4] rounded-2xl px-4 gap-2 transition-all">
+                <div className="flex-1 flex items-center bg-[var(--nx-card)] border border-[var(--nx-border)] focus-within:border-[#7c6ff7] rounded-2xl px-4 gap-2 transition-all">
                   <input
                     type="text"
                     placeholder="Type a message…"
                     value={text}
                     onChange={e => { setText(e.target.value); handleType(); }}
-                    className="flex-1 bg-transparent border-none outline-none py-2.5 text-sm text-[#e8eaf0] placeholder-[#6b7280]"
+                    className="flex-1 bg-transparent border-none outline-none py-2.5 text-sm text-[var(--nx-text)] placeholder-[var(--nx-muted)]"
                   />
                 </div>
                 <button
@@ -368,8 +381,8 @@ export default function MessagesPage() {
                   className={cx(
                     'w-9 h-9 flex items-center justify-center rounded-xl shrink-0 transition-all',
                     text.trim()
-                      ? 'bg-[#00d4b4] text-[#0d0f14] shadow-[0_0_16px_rgba(0,212,180,0.3)] hover:bg-[#00b89c]'
-                      : 'bg-[#232736] text-[#6b7280]'
+                      ? 'bg-[#7c6ff7] text-[var(--nx-bg)] shadow-[0_0_16px_rgba(124,111,247,0.3)] hover:bg-[#6459e0]'
+                      : 'bg-[var(--nx-border)] text-[var(--nx-muted)]'
                   )}
                 >
                   <Send size={15} />
@@ -379,12 +392,12 @@ export default function MessagesPage() {
           </>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-6">
-            <div className="w-20 h-20 rounded-2xl bg-[rgba(0,212,180,0.1)] flex items-center justify-center">
-              <Send size={36} className="text-[#00d4b4]" />
+            <div className="w-20 h-20 rounded-2xl bg-[rgba(124,111,247,0.1)] flex items-center justify-center">
+              <Send size={36} className="text-[#7c6ff7]" />
             </div>
             <div>
-              <p className="text-lg font-bold text-[#f4f6fc] font-[var(--font-display)]">Your Messages</p>
-              <p className="text-sm text-[#6b7280] mt-1">Select a conversation or start a new one</p>
+              <p className="text-lg font-bold text-[var(--nx-heading)] font-[var(--font-display)]">Your Messages</p>
+              <p className="text-sm text-[var(--nx-muted)] mt-1">Select a conversation or start a new one</p>
             </div>
             <Button
               variant="primary"
@@ -408,12 +421,12 @@ export default function MessagesPage() {
             onChange={e => setGroupName(e.target.value)}
           />
           <div>
-            <p className="text-xs font-bold text-[#6b7280] uppercase tracking-wider mb-2">Add Participants</p>
+            <p className="text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-2">Add Participants</p>
             <div className="space-y-1 max-h-56 overflow-y-auto">
               {friends.map(f => (
                 <label
                   key={(f as User)._id}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#181c26] cursor-pointer transition-colors"
+                  className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--nx-card)] cursor-pointer transition-colors"
                 >
                   <input
                     type="checkbox"
@@ -421,10 +434,10 @@ export default function MessagesPage() {
                     onChange={e => setPicked(p =>
                       e.target.checked ? [...p, (f as User)._id] : p.filter(id => id !== (f as User)._id)
                     )}
-                    className="w-4 h-4 rounded accent-[#00d4b4]"
+                    className="w-4 h-4 rounded accent-[#7c6ff7]"
                   />
                   <Avatar user={f as User} size={34} />
-                  <p className="text-sm font-medium text-[#e8eaf0]">{(f as User).firstName} {(f as User).lastName}</p>
+                  <p className="text-sm font-medium text-[var(--nx-text)]">{(f as User).firstName} {(f as User).lastName}</p>
                 </label>
               ))}
             </div>

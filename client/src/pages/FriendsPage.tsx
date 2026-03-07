@@ -53,7 +53,7 @@ export default function FriendsPage() {
   return (
     <div className="max-w-[1000px] mx-auto px-4 py-5">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-black text-[#f4f6fc] font-[var(--font-display)] tracking-tight">Friends</h1>
+        <h1 className="text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">Friends</h1>
       </div>
 
       <Tabs tabs={tabs} active={tab} onChange={setTab} className="mb-5 max-w-sm" />
@@ -76,10 +76,10 @@ export default function FriendsPage() {
                     >
                       <Avatar user={req.from} size={52} />
                       <div>
-                        <p className="font-bold text-[#f4f6fc] text-sm font-[var(--font-display)] group-hover:text-[#00d4b4] transition-colors">
+                        <p className="font-bold text-[var(--nx-heading)] text-sm font-[var(--font-display)] group-hover:text-[#7c6ff7] transition-colors">
                           {req.from.firstName} {req.from.lastName}
                         </p>
-                        <p className="text-xs text-[#6b7280]">{(req.from.friends as string[])?.length || 0} mutual friends</p>
+                        <p className="text-xs text-[var(--nx-muted)]">{(req.from.friends as string[])?.length || 0} mutual friends</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -112,12 +112,12 @@ export default function FriendsPage() {
                     />
                     <div className="p-3">
                       <p
-                        className="font-bold text-[#f4f6fc] text-sm truncate cursor-pointer hover:text-[#00d4b4] transition-colors mb-0.5 font-[var(--font-display)]"
+                        className="font-bold text-[var(--nx-heading)] text-sm truncate cursor-pointer hover:text-[#7c6ff7] transition-colors mb-0.5 font-[var(--font-display)]"
                         onClick={() => nav(`/profile/${u._id}`)}
                       >
                         {u.firstName} {u.lastName}
                       </p>
-                      <p className="text-xs text-[#6b7280] mb-2.5">{(u.friends as string[])?.length || 0} mutual friends</p>
+                      <p className="text-xs text-[var(--nx-muted)] mb-2.5">{(u.friends as string[])?.length || 0} mutual friends</p>
                       <Button variant="primary" fullWidth size="xs" icon={<UserPlus size={12} />} onClick={() => sendReq(u._id)}>
                         Add Friend
                       </Button>
@@ -144,7 +144,7 @@ export default function FriendsPage() {
                     />
                     <div className="p-3">
                       <p
-                        className="font-bold text-[#f4f6fc] text-sm truncate cursor-pointer hover:text-[#00d4b4] transition-colors font-[var(--font-display)]"
+                        className="font-bold text-[var(--nx-heading)] text-sm truncate cursor-pointer hover:text-[#7c6ff7] transition-colors font-[var(--font-display)]"
                         onClick={() => nav(`/profile/${(f as User)._id}`)}
                       >
                         {(f as User).firstName} {(f as User).lastName}

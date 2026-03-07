@@ -110,7 +110,7 @@ export default function ProfilePage() {
     </div>
   );
   if (!profile) return (
-    <div className="text-center py-16 text-[#6b7280]">User not found</div>
+    <div className="text-center py-16 text-[var(--nx-muted)]">User not found</div>
   );
 
   const friends = profile.friends as User[];
@@ -129,19 +129,19 @@ export default function ProfilePage() {
     <div className="max-w-[980px] mx-auto pb-8">
 
       {/* Cover photo */}
-      <div className="relative h-64 sm:h-80 bg-gradient-to-br from-[#00d4b4]/30 via-[#6366f1]/20 to-[#0d0f14] overflow-hidden">
+      <div className="relative h-64 sm:h-80 bg-gradient-to-br from-[#7c6ff7]/30 via-[#6366f1]/20 to-[var(--nx-bg)] overflow-hidden">
         {profile.coverPhoto && (
           <img src={profile.coverPhoto} alt="" className="w-full h-full object-cover" />
         )}
         {/* Grid overlay */}
         <div className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `linear-gradient(#00d4b4 1px, transparent 1px), linear-gradient(90deg, #00d4b4 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(#7c6ff7 1px, transparent 1px), linear-gradient(90deg, #7c6ff7 1px, transparent 1px)`,
             backgroundSize: '30px 30px',
           }}
         />
         {isOwner && (
-          <label className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-[#13161e]/90 backdrop-blur-sm text-[#e8eaf0] text-xs font-semibold px-3 py-2 rounded-xl cursor-pointer hover:bg-[#181c26] transition-colors border border-[#2e3347]">
+          <label className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-[var(--nx-surface)]/90 backdrop-blur-sm text-[var(--nx-text)] text-xs font-semibold px-3 py-2 rounded-xl cursor-pointer hover:bg-[var(--nx-card)] transition-colors border border-[var(--nx-border-2)]">
             <Camera size={13} /> Edit Cover
             <input type="file" accept="image/*" className="hidden"
               onChange={e => e.target.files?.[0] && changePhoto('coverPhoto', e.target.files[0])} />
@@ -150,7 +150,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile header */}
-      <div className="bg-[#13161e] border border-[#232736] border-t-0 px-4 sm:px-6 pb-4">
+      <div className="bg-[var(--nx-surface)] border border-[var(--nx-border)] border-t-0 px-4 sm:px-6 pb-4">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           {/* Avatar */}
           <div className="flex items-end gap-4 -mt-14 sm:-mt-16">
@@ -158,21 +158,21 @@ export default function ProfilePage() {
               <img
                 src={getAvatar(profile, 256)}
                 alt=""
-                className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-4 border-[#13161e] shadow-2xl"
+                className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover border-4 border-[var(--nx-surface)] shadow-2xl"
               />
               {isOwner && (
-                <label className="absolute bottom-2 right-2 w-8 h-8 bg-[#13161e] border border-[#2e3347] rounded-xl flex items-center justify-center cursor-pointer hover:bg-[#232736] transition-colors">
-                  <Camera size={14} className="text-[#9ca3af]" />
+                <label className="absolute bottom-2 right-2 w-8 h-8 bg-[var(--nx-surface)] border border-[var(--nx-border-2)] rounded-xl flex items-center justify-center cursor-pointer hover:bg-[var(--nx-border)] transition-colors">
+                  <Camera size={14} className="text-[var(--nx-subtle)]" />
                   <input type="file" accept="image/*" className="hidden"
                     onChange={e => e.target.files?.[0] && changePhoto('avatar', e.target.files[0])} />
                 </label>
               )}
             </div>
             <div className="pb-2">
-              <h1 className="text-xl sm:text-2xl font-black text-[#f4f6fc] font-[var(--font-display)] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">
                 {profile.firstName} {profile.lastName}
               </h1>
-              <p className="text-[#6b7280] text-sm mt-0.5">{friends.length} friends</p>
+              <p className="text-[var(--nx-muted)] text-sm mt-0.5">{friends.length} friends</p>
               {/* Friend avatars */}
               <div className="flex mt-1.5">
                 {friends.slice(0, 5).map((f, i) => (
@@ -180,7 +180,7 @@ export default function ProfilePage() {
                     key={i}
                     src={getAvatar(f as User, 40)}
                     alt=""
-                    className={cx('w-6 h-6 rounded-full border-2 border-[#13161e] object-cover', i > 0 && '-ml-1.5')}
+                    className={cx('w-6 h-6 rounded-full border-2 border-[var(--nx-surface)] object-cover', i > 0 && '-ml-1.5')}
                   />
                 ))}
               </div>
@@ -226,11 +226,11 @@ export default function ProfilePage() {
 
         {/* Bio preview */}
         {profile.bio && !editing && (
-          <p className="text-[#9ca3af] text-sm mt-3 border-t border-[#232736] pt-3">{profile.bio}</p>
+          <p className="text-[var(--nx-subtle)] text-sm mt-3 border-t border-[var(--nx-border)] pt-3">{profile.bio}</p>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-0 mt-3 border-t border-[#232736] -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1">
+        <div className="flex gap-0 mt-3 border-t border-[var(--nx-border)] -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1">
           {(['posts', 'about', 'friends', 'photos'] as Tab[]).map(t => (
             <button
               key={t}
@@ -238,8 +238,8 @@ export default function ProfilePage() {
               className={cx(
                 'px-4 py-2 text-sm font-semibold capitalize transition-all',
                 tab === t
-                  ? 'text-[#00d4b4] border-b-2 border-[#00d4b4]'
-                  : 'text-[#6b7280] hover:text-[#e8eaf0] hover:bg-[#181c26] rounded-xl'
+                  ? 'text-[#7c6ff7] border-b-2 border-[#7c6ff7]'
+                  : 'text-[var(--nx-muted)] hover:text-[var(--nx-text)] hover:bg-[var(--nx-card)] rounded-xl'
               )}
             >
               {t}
@@ -251,7 +251,7 @@ export default function ProfilePage() {
       {/* Edit form */}
       {editing && isOwner && (
         <Card className="p-5 mt-4 mx-2 sm:mx-0">
-          <h3 className="font-bold text-[#f4f6fc] mb-4 font-[var(--font-display)]">Edit Profile</h3>
+          <h3 className="font-bold text-[var(--nx-heading)] mb-4 font-[var(--font-display)]">Edit Profile</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input label="First Name" value={editData.firstName} onChange={e => setEditData(d => ({ ...d, firstName: e.target.value }))} />
             <Input label="Last Name"  value={editData.lastName}  onChange={e => setEditData(d => ({ ...d, lastName: e.target.value }))} />
@@ -282,17 +282,17 @@ export default function ProfilePage() {
             {/* Sidebar — intro + photos */}
             <div className="space-y-3">
               <Card className="p-4">
-                <h3 className="font-bold text-[#f4f6fc] mb-3 font-[var(--font-display)]">Intro</h3>
+                <h3 className="font-bold text-[var(--nx-heading)] mb-3 font-[var(--font-display)]">Intro</h3>
                 <div className="space-y-2.5">
                   {aboutItems.filter(a => a.val).map(({ icon: Icon, label, val, link }) => (
                     <div key={label} className="flex items-center gap-2.5 text-sm">
-                      <span className="w-7 h-7 bg-[#232736] rounded-lg flex items-center justify-center shrink-0">
-                        <Icon size={13} className="text-[#9ca3af]" />
+                      <span className="w-7 h-7 bg-[var(--nx-border)] rounded-lg flex items-center justify-center shrink-0">
+                        <Icon size={13} className="text-[var(--nx-subtle)]" />
                       </span>
-                      <span className="text-[#9ca3af]">{label}</span>
+                      <span className="text-[var(--nx-subtle)]">{label}</span>
                       {link
-                        ? <a href={val} target="_blank" rel="noreferrer" className="text-[#00d4b4] hover:underline truncate">{val}</a>
-                        : <strong className="text-[#e8eaf0]">{val}</strong>
+                        ? <a href={val} target="_blank" rel="noreferrer" className="text-[#7c6ff7] hover:underline truncate">{val}</a>
+                        : <strong className="text-[var(--nx-text)]">{val}</strong>
                       }
                     </div>
                   ))}
@@ -302,8 +302,8 @@ export default function ProfilePage() {
               {photos.length > 0 && (
                 <Card className="p-4">
                   <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-bold text-[#f4f6fc] font-[var(--font-display)]">Photos</h3>
-                    <button onClick={() => setTab('photos')} className="text-xs text-[#00d4b4] hover:text-[#00b89c]">See all</button>
+                    <h3 className="font-bold text-[var(--nx-heading)] font-[var(--font-display)]">Photos</h3>
+                    <button onClick={() => setTab('photos')} className="text-xs text-[#7c6ff7] hover:text-[#6459e0]">See all</button>
                   </div>
                   <div className="grid grid-cols-3 gap-0.5 rounded-xl overflow-hidden">
                     {photos.slice(0, 9).map((url, i) => (
@@ -330,18 +330,18 @@ export default function ProfilePage() {
         {/* About tab */}
         {tab === 'about' && (
           <Card className="p-6 mx-2 sm:mx-0">
-            <h3 className="font-bold text-[#f4f6fc] text-lg mb-5 font-[var(--font-display)]">About {profile.firstName}</h3>
+            <h3 className="font-bold text-[var(--nx-heading)] text-lg mb-5 font-[var(--font-display)]">About {profile.firstName}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {aboutItems.filter(a => a.val).map(({ icon: Icon, label, val, link }) => (
-                <div key={label} className="flex items-center gap-3 p-3.5 bg-[#13161e] border border-[#232736] rounded-xl">
-                  <span className="w-9 h-9 bg-[rgba(0,212,180,0.1)] rounded-xl flex items-center justify-center shrink-0">
-                    <Icon size={15} className="text-[#00d4b4]" />
+                <div key={label} className="flex items-center gap-3 p-3.5 bg-[var(--nx-surface)] border border-[var(--nx-border)] rounded-xl">
+                  <span className="w-9 h-9 bg-[rgba(124,111,247,0.1)] rounded-xl flex items-center justify-center shrink-0">
+                    <Icon size={15} className="text-[#7c6ff7]" />
                   </span>
                   <div>
-                    <p className="text-[10px] text-[#6b7280] font-bold uppercase tracking-wider">{label}</p>
+                    <p className="text-[10px] text-[var(--nx-muted)] font-bold uppercase tracking-wider">{label}</p>
                     {link
-                      ? <a href={val} target="_blank" rel="noreferrer" className="text-[#00d4b4] hover:underline text-sm">{val}</a>
-                      : <p className="text-[#e8eaf0] font-semibold text-sm">{val}</p>
+                      ? <a href={val} target="_blank" rel="noreferrer" className="text-[#7c6ff7] hover:underline text-sm">{val}</a>
+                      : <p className="text-[var(--nx-text)] font-semibold text-sm">{val}</p>
                     }
                   </div>
                 </div>
@@ -353,8 +353,8 @@ export default function ProfilePage() {
         {/* Friends tab */}
         {tab === 'friends' && (
           <Card className="p-5 mx-2 sm:mx-0">
-            <h3 className="font-bold text-[#f4f6fc] mb-4 font-[var(--font-display)]">
-              Friends · <span className="text-[#00d4b4]">{friends.length}</span>
+            <h3 className="font-bold text-[var(--nx-heading)] mb-4 font-[var(--font-display)]">
+              Friends · <span className="text-[#7c6ff7]">{friends.length}</span>
             </h3>
             {friends.length === 0 ? (
               <EmptyState icon={<span className="text-2xl">👥</span>} title="No friends yet" />
@@ -371,7 +371,7 @@ export default function ProfilePage() {
                       alt=""
                       className="w-full aspect-square object-cover rounded-xl group-hover:opacity-80 transition-opacity"
                     />
-                    <p className="mt-1.5 text-sm font-semibold text-[#e8eaf0] truncate text-center group-hover:text-[#00d4b4] transition-colors">
+                    <p className="mt-1.5 text-sm font-semibold text-[var(--nx-text)] truncate text-center group-hover:text-[#7c6ff7] transition-colors">
                       {(f as User).firstName} {(f as User).lastName}
                     </p>
                   </div>
@@ -384,8 +384,8 @@ export default function ProfilePage() {
         {/* Photos tab */}
         {tab === 'photos' && (
           <Card className="p-5 mx-2 sm:mx-0">
-            <h3 className="font-bold text-[#f4f6fc] mb-4 font-[var(--font-display)]">
-              Photos · <span className="text-[#00d4b4]">{photos.length}</span>
+            <h3 className="font-bold text-[var(--nx-heading)] mb-4 font-[var(--font-display)]">
+              Photos · <span className="text-[#7c6ff7]">{photos.length}</span>
             </h3>
             {photos.length === 0 ? (
               <EmptyState icon={<span className="text-2xl">📸</span>} title="No photos yet" />

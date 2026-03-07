@@ -11,11 +11,12 @@ import FriendsPage from './pages/FriendsPage';
 import MessagesPage from './pages/MessagesPage';
 import GroupsPage  from './pages/GroupsPage';
 import { Spinner } from './components/ui';
+import { useTheme } from './store/themeStore';
 
 // Layout wrapper for authenticated pages
 function AppLayout() {
   return (
-    <div className="min-h-screen bg-[#0d0f14]">
+    <div className="min-h-screen bg-[var(--nx-bg)]">
       <Navbar />
       <div className="pt-14">
         <Outlet />
@@ -28,10 +29,10 @@ function AppLayout() {
 function ProtectedRoute() {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) return (
-    <div className="fixed inset-0 bg-[#0d0f14] flex items-center justify-center">
+    <div className="fixed inset-0 bg-[var(--nx-bg)] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-[#00d4b4] flex items-center justify-center shadow-[0_0_30px_rgba(0,212,180,0.4)]">
-          <span className="text-[#0d0f14] font-black text-xl font-[var(--font-display)]">N</span>
+        <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background:"#7c6ff7", boxShadow:"0 0 30px rgba(124,111,247,0.4)" }}>
+          <span className="text-[var(--nx-bg)] font-black text-xl font-[var(--font-display)]">N</span>
         </div>
         <Spinner size={24} />
       </div>
@@ -42,6 +43,7 @@ function ProtectedRoute() {
 
 export default function App() {
   const { init, user, isAuthenticated } = useAuth();
+  useTheme(); // initialize theme on app load
   const { connect, disconnect } = useSocket();
 
   useEffect(() => { init(); }, [init]);
@@ -57,15 +59,15 @@ export default function App() {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#181c26',
-            color: '#e8eaf0',
-            border: '1px solid #2e3347',
+            background: 'var(--nx-card)',
+            color: 'var(--nx-text)',
+            border: '1px solid #272d44',
             borderRadius: '12px',
             fontSize: '13px',
             fontFamily: 'DM Sans, sans-serif',
           },
-          success: { iconTheme: { primary: '#00d4b4', secondary: '#0d0f14' } },
-          error:   { iconTheme: { primary: '#f43f5e', secondary: '#ffffff' } },
+          success: { iconTheme: { primary: '#7c6ff7', secondary: 'var(--nx-bg)' } },
+          error:   { iconTheme: { primary: '#fb4570', secondary: '#ffffff' } },
         }}
       />
       <Routes>
