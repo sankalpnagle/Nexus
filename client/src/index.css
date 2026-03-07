@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Sora', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+
+  /* Dark editorial palette */
+  --color-nx-bg:       #0d0f14;
+  --color-nx-surface:  #13161e;
+  --color-nx-card:     #181c26;
+  --color-nx-border:   #232736;
+  --color-nx-border-2: #2e3347;
+  --color-nx-muted:    #6b7280;
+  --color-nx-subtle:   #9ca3af;
+  --color-nx-text:     #e8eaf0;
+  --color-nx-heading:  #f4f6fc;
+
+  /* Accent — electric teal */
+  --color-accent:      #00d4b4;
+  --color-accent-dim:  #00b89c;
+  --color-accent-glow: rgba(0, 212, 180, 0.15);
+  --color-accent-bg:   rgba(0, 212, 180, 0.08);
+
+  /* Semantic */
+  --color-danger:  #f43f5e;
+  --color-warning: #f59e0b;
+  --color-success: #10b981;
+  --color-info:    #6366f1;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+body {
+  background-color: var(--color-nx-bg);
+  color: var(--color-nx-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Thin elegant scrollbar */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--color-nx-border-2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-nx-muted); }
+
+/* Selection */
+::selection { background: var(--color-accent-glow); color: var(--color-accent); }
+
+/* Smooth transitions */
+a, button { transition: color 150ms, background-color 150ms, border-color 150ms, opacity 150ms, transform 150ms; }
+
+/* Typography hierarchy */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-nx-heading);
+  letter-spacing: -0.02em;
+}
+
+/* Glass card effect */
+.glass {
+  background: rgba(24, 28, 38, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-nx-border);
+}
+
+/* Glow effects */
+.accent-glow {
+  box-shadow: 0 0 20px var(--color-accent-glow);
+}
+
+/* Animated gradient border */
+@keyframes border-glow {
+  0%, 100% { border-color: var(--color-accent); }
+  50%       { border-color: var(--color-info); }
+}
+
+/* Typing dots */
+@keyframes dot-bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30%            { transform: translateY(-5px); }
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fade-in 0.25s ease forwards; }
+
+/* Online indicator pulse */
+@keyframes online-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+  50%       { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+}
+.online-pulse { animation: online-pulse 2.5s infinite; }
