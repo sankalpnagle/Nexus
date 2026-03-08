@@ -3,7 +3,7 @@ import { User } from '../types';
 export const getAvatar = (u?: User | null, size = 80): string => {
   if (u?.avatar) return u.avatar;
   const name = encodeURIComponent(`${u?.firstName || 'U'} ${u?.lastName || ''}`);
-  return `https://ui-avatars.com/api/?name=${name}&background=00d4b4&color=0d0f14&size=${size}&bold=true&format=png`;
+  return `https://ui-avatars.com/api/?name=${name}&background=9b83f9&color=ffffff&size=${size}&bold=true&format=png`;
 };
 
 export const getGroupAvatar = (name?: string, size = 80): string => {
