@@ -1,32 +1,57 @@
-import 'dotenv/config';
-import express from 'express';
-import http from 'http';
-import { Server } from 'socket.io';
-import cors from 'cors';
-import { connectDB } from './config/database.js';
-import routes from './routes/index.js';
-import { initSocket } from './socket/index.js';
+import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import cors from "cors";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-const app    = express();
+import { initSocket } from "./socket/index.js";
+import { registerIOForEmitter } from "./socket/socketEmitter.js";
+import router from "./routes/index.js";
+
+dotenv.config();
+
+const app = express();
 const server = http.createServer(app);
-const io     = new Server(server, {
+
+// ── Socket.IO ─────────────────────────────────────────────────────────────────
+const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: process.env.CLIENT_URL ?? "http://localhost:5173",
+    methods: ["GET", "POST"],
     credentials: true,
   },
+  pingTimeout: 60000,
+  pingInterval: 25000,
 });
 
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use('/api', routes);
-app.get('/health', (_, res) => res.json({ status: 'OK', service: 'Nexus API v2' }));
+initSocket(io); // register all event handlers
+registerIOForEmitter(io); // allow controllers to emit events
 
-initSocket(io);
+// ── Middleware ────────────────────────────────────────────────────────────────
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL ?? "http://localhost:5173",
+    credentials: true,
+  }),
+);
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
 
-const PORT = parseInt(process.env.PORT || '5000');
+// ── Routes ────────────────────────────────────────────────────────────────────
+app.use("/api", router);
 
-connectDB()
-  .then(() => server.listen(PORT, () => console.log(`🚀 Nexus API → http://localhost:${PORT}`)))
-  .catch(err => { console.error('Failed to start:', err); process.exit(1); });
+// ── DB + Start ────────────────────────────────────────────────────────────────
+const PORT = process.env.PORT ?? 5000;
+
+mongoose
+  .connect(process.env.MONGODB_URI ?? "mongodb://localhost:27017/nexus")
+  .then(() => {
+    server.listen(PORT, () => console.log(`[Server] running on port ${PORT}`));
+  })
+  .catch((err) => {
+    console.error("[MongoDB] connection failed", err);
+    process.exit(1);
+  });
+
+export { io };
