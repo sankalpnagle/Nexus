@@ -239,7 +239,7 @@ export default function Navbar() {
       </div>
 
       {/* Nav tabs — center */}
-      <nav className="flex-1 flex items-center justify-center gap-1">
+      <nav className="flex-1 flex items-center justify-center gap-x-4 gap-y-1">
         {navLinks.map(({ to, icon: Icon, label }) => {
           const active =
             to === "/" ? loc.pathname === "/" : loc.pathname.startsWith(to);

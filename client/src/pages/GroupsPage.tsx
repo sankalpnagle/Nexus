@@ -1,68 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Grid3x3, Users, Lock, Globe, Plus, Search,
-  ChevronRight, Crown, UserPlus, LogOut,
-} from 'lucide-react';
-import { Group } from '../types';
-import api from '../utils/api';
-import { useAuth } from '../store/authStore';
-import { Button, Card, EmptyState, Input, Modal, Spinner, Tabs, Textarea } from '../components/ui';
-import { getGroupAvatar, cx } from '../utils/helpers';
-import toast from 'react-hot-toast';
+  Grid3x3,
+  Users,
+  Lock,
+  Globe,
+  Plus,
+  Search,
+  ChevronRight,
+  Crown,
+  UserPlus,
+  LogOut,
+} from "lucide-react";
+import { Group } from "../types";
+import api from "../utils/api";
+import { useAuth } from "../store/authStore";
+import {
+  Button,
+  Card,
+  EmptyState,
+  Input,
+  Modal,
+  Spinner,
+  Tabs,
+  Textarea,
+} from "../components/ui";
+import { getGroupAvatar, cx } from "../utils/helpers";
+import toast from "react-hot-toast";
 
-const CATEGORIES = ['All', 'Technology', 'Gaming', 'Music', 'Sports', 'Art', 'Education', 'Food', 'Travel', 'General'];
+const CATEGORIES = [
+  "All",
+  "Technology",
+  "Gaming",
+  "Music",
+  "Sports",
+  "Art",
+  "Education",
+  "Food",
+  "Travel",
+  "General",
+];
 
-type Tab = 'discover' | 'mine';
+type Tab = "discover" | "mine";
 
 export default function GroupsPage() {
   const { user: me } = useAuth();
   const nav = useNavigate();
-  const [tab, setTab]             = useState<Tab>('discover');
-  const [groups, setGroups]       = useState<Group[]>([]);
-  const [myGroups, setMyGroups]   = useState<Group[]>([]);
-  const [loading, setLoading]     = useState(true);
-  const [category, setCategory]   = useState('All');
-  const [search, setSearch]       = useState('');
+  const [tab, setTab] = useState<Tab>("discover");
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [myGroups, setMyGroups] = useState<Group[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState("All");
+  const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
-  const [creating, setCreating]   = useState(false);
+  const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({
-    name: '', description: '', privacy: 'public', category: 'General', rules: '',
+    name: "",
+    description: "",
+    privacy: "public",
+    category: "General",
+    rules: "",
   });
 
-  useEffect(() => { fetchGroups(); fetchMyGroups(); }, [category, search]);
+  useEffect(() => {
+    fetchGroups();
+    fetchMyGroups();
+  }, [category, search]);
 
   const fetchGroups = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (category !== 'All') params.set('category', category);
-      if (search) params.set('search', search);
+      if (category !== "All") params.set("category", category);
+      if (search) params.set("search", search);
       const r = await api.get(`/groups?${params}`);
       setGroups(r.data.groups);
-    } catch {} finally { setLoading(false); }
+    } catch {
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fetchMyGroups = async () => {
-    try { const r = await api.get('/groups/mine'); setMyGroups(r.data.groups); } catch {}
+    try {
+      const r = await api.get("/groups/mine");
+      setMyGroups(r.data.groups);
+    } catch {}
   };
 
   const join = async (groupId: string) => {
     try {
       const r = await api.post(`/groups/${groupId}/join`);
       toast.success(r.data.message);
-      fetchGroups(); fetchMyGroups();
+      fetchGroups();
+      fetchMyGroups();
     } catch (err: unknown) {
-      toast.error((err as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed');
+      toast.error(
+        (err as { response?: { data?: { message?: string } } }).response?.data
+          ?.message || "Failed",
+      );
     }
   };
 
   const leave = async (groupId: string) => {
     try {
       await api.post(`/groups/${groupId}/leave`);
-      toast.success('Left group');
-      fetchGroups(); fetchMyGroups();
-    } catch { toast.error('Failed'); }
+      toast.success("Left group");
+      fetchGroups();
+      fetchMyGroups();
+    } catch {
+      toast.error("Failed");
+    }
   };
 
   const createGroup = async () => {
@@ -71,24 +119,43 @@ export default function GroupsPage() {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
-      await api.post('/groups', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
-      toast.success('Group created!');
+      await api.post("/groups", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success("Group created!");
       setShowCreate(false);
-      setForm({ name: '', description: '', privacy: 'public', category: 'General', rules: '' });
-      fetchGroups(); fetchMyGroups();
-    } catch { toast.error('Failed to create group'); }
-    finally { setCreating(false); }
+      setForm({
+        name: "",
+        description: "",
+        privacy: "public",
+        category: "General",
+        rules: "",
+      });
+      fetchGroups();
+      fetchMyGroups();
+    } catch {
+      toast.error("Failed to create group");
+    } finally {
+      setCreating(false);
+    }
   };
 
   const isMember = (g: Group) =>
-    g.members.some(m => (typeof m === 'string' ? m : (m as { _id: string })._id) === me?._id);
+    g.members.some(
+      (m) =>
+        (typeof m === "string" ? m : (m as { _id: string })._id) === me?._id,
+    );
 
-  const isAdmin = (g: Group) =>
-    typeof g.admin === 'string' ? g.admin === me?._id : (g.admin as { _id: string })._id === me?._id;
+  const isAdmin = (g: Group) => {
+    if (!g.admin) return false;
+    return typeof g.admin === "string"
+      ? g.admin === me?._id
+      : (g.admin as { _id: string })._id === me?._id;
+  };
 
   const GroupCard = ({ g }: { g: Group }) => {
     const member = isMember(g);
-    const admin  = isAdmin(g);
+    const admin = isAdmin(g);
     return (
       <Card className="overflow-hidden hover:border-[var(--nx-border-2)] transition-colors group">
         <div className="relative">
@@ -99,13 +166,15 @@ export default function GroupsPage() {
             onClick={() => nav(`/groups/${g._id}`)}
           />
           <div className="absolute top-2 right-2">
-            <span className={cx(
-              'inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full',
-              g.privacy === 'public'
-                ? 'bg-emerald-500/20 text-[#10d98a]'
-                : 'bg-[var(--nx-muted)]/20 text-[var(--nx-subtle)]'
-            )}>
-              {g.privacy === 'public' ? <Globe size={9} /> : <Lock size={9} />}
+            <span
+              className={cx(
+                "inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full",
+                g.privacy === "public"
+                  ? "bg-emerald-500/20 text-[#10d98a]"
+                  : "bg-[var(--nx-muted)]/20 text-[var(--nx-subtle)]",
+              )}
+            >
+              {g.privacy === "public" ? <Globe size={9} /> : <Lock size={9} />}
               {g.privacy}
             </span>
           </div>
@@ -125,16 +194,30 @@ export default function GroupsPage() {
             {g.name}
           </p>
           <div className="flex items-center gap-3 text-xs text-[var(--nx-muted)] mt-1 mb-3">
-            <span className="flex items-center gap-1"><Users size={10} /> {(g.members as unknown[]).length} members</span>
-            <span className="flex items-center gap-1"><Grid3x3 size={10} /> {g.category}</span>
+            <span className="flex items-center gap-1">
+              <Users size={10} /> {(g.members as unknown[]).length} members
+            </span>
+            <span className="flex items-center gap-1">
+              <Grid3x3 size={10} /> {g.category}
+            </span>
           </div>
           {member ? (
             <div className="flex gap-2">
-              <Button variant="primary" size="sm" fullWidth onClick={() => nav(`/groups/${g._id}`)}>
+              <Button
+                variant="primary"
+                size="sm"
+                fullWidth
+                onClick={() => nav(`/groups/${g._id}`)}
+              >
                 View Group
               </Button>
               {!admin && (
-                <Button variant="secondary" size="sm" icon={<LogOut size={12} />} onClick={() => leave(g._id)}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  icon={<LogOut size={12} />}
+                  onClick={() => leave(g._id)}
+                >
                   Leave
                 </Button>
               )}
@@ -147,7 +230,7 @@ export default function GroupsPage() {
               icon={<UserPlus size={13} />}
               onClick={() => join(g._id)}
             >
-              {g.privacy === 'public' ? 'Join Group' : 'Request to Join'}
+              {g.privacy === "public" ? "Join Group" : "Request to Join"}
             </Button>
           )}
         </div>
@@ -158,43 +241,56 @@ export default function GroupsPage() {
   return (
     <div className="max-w-[1100px] mx-auto px-4 py-5">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">Groups</h1>
-        <Button variant="primary" size="sm" icon={<Plus size={14} />} onClick={() => setShowCreate(true)}>
+        <h1 className="text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">
+          Groups
+        </h1>
+        <Button
+          variant="primary"
+          size="sm"
+          icon={<Plus size={14} />}
+          onClick={() => setShowCreate(true)}
+        >
           Create Group
         </Button>
       </div>
 
       <Tabs
-        tabs={[{ key: 'discover' as Tab, label: 'Discover' }, { key: 'mine' as Tab, label: 'Your Groups', count: myGroups.length }]}
+        tabs={[
+          { key: "discover" as Tab, label: "Discover" },
+          { key: "mine" as Tab, label: "Your Groups", count: myGroups.length },
+        ]}
         active={tab}
         onChange={setTab}
         className="max-w-xs mb-5"
       />
 
-      {tab === 'discover' && (
+      {tab === "discover" && (
         <>
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3 mb-5">
             <div className="relative flex-1">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--nx-muted)]" />
+              <Search
+                size={13}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--nx-muted)]"
+              />
               <input
                 type="text"
                 placeholder="Search groups…"
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 className="w-full pl-8 pr-3 py-2 bg-[var(--nx-surface)] border border-[var(--nx-border)] rounded-xl text-sm text-[var(--nx-text)] placeholder-[var(--nx-muted)] focus:outline-none focus:border-[#7c6ff7] transition-colors"
               />
             </div>
             <div className="flex gap-1.5 flex-wrap">
-              {CATEGORIES.slice(0, 6).map(cat => (
+              {CATEGORIES.slice(0, 6).map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setCategory(cat)}
                   className={cx(
-                    'px-3 py-1.5 rounded-xl text-xs font-medium transition-all',
+                    "px-3 py-1.5 rounded-xl text-xs font-medium transition-all",
                     category === cat
-                      ? 'bg-[#7c6ff7] text-[var(--nx-bg)] font-bold'
-                      : 'bg-[var(--nx-card)] border border-[var(--nx-border)] text-[var(--nx-subtle)] hover:border-[var(--nx-border-2)]'
+                      ? "bg-[#7c6ff7] text-[var(--nx-bg)] font-bold"
+                      : "bg-[var(--nx-card)] border border-[var(--nx-border)] text-[var(--nx-subtle)] hover:border-[var(--nx-border-2)]",
                   )}
                 >
                   {cat}
@@ -204,19 +300,27 @@ export default function GroupsPage() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-16"><Spinner size={36} /></div>
+            <div className="flex justify-center py-16">
+              <Spinner size={36} />
+            </div>
           ) : groups.length === 0 ? (
-            <EmptyState icon={<Grid3x3 size={28} />} title="No groups found" subtitle="Try a different search or category" />
+            <EmptyState
+              icon={<Grid3x3 size={28} />}
+              title="No groups found"
+              subtitle="Try a different search or category"
+            />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {groups.map(g => <GroupCard key={g._id} g={g} />)}
+              {groups.map((g) => (
+                <GroupCard key={g._id} g={g} />
+              ))}
             </div>
           )}
         </>
       )}
 
-      {tab === 'mine' && (
-        myGroups.length === 0 ? (
+      {tab === "mine" &&
+        (myGroups.length === 0 ? (
           <EmptyState
             icon={<Grid3x3 size={28} />}
             title="No groups yet"
@@ -224,33 +328,45 @@ export default function GroupsPage() {
           />
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {myGroups.map(g => <GroupCard key={g._id} g={g} />)}
+            {myGroups.map((g) => (
+              <GroupCard key={g._id} g={g} />
+            ))}
           </div>
-        )
-      )}
+        ))}
 
       {/* Create group modal */}
-      <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Create Group" maxWidth="max-w-lg">
+      <Modal
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        title="Create Group"
+        maxWidth="max-w-lg"
+      >
         <div className="p-5 space-y-4">
           <Input
             label="Group Name *"
             placeholder="Give your group a name"
             value={form.name}
-            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
           />
           <Textarea
             label="Description"
             placeholder="What's this group about?"
             value={form.description}
             rows={3}
-            onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, description: e.target.value }))
+            }
           />
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5">Privacy</label>
+              <label className="block text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5">
+                Privacy
+              </label>
               <select
                 value={form.privacy}
-                onChange={e => setForm(f => ({ ...f, privacy: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, privacy: e.target.value }))
+                }
                 className="w-full bg-[var(--nx-surface)] border border-[var(--nx-border)] text-[var(--nx-text)] rounded-xl text-sm px-3.5 py-2.5 focus:outline-none focus:border-[#7c6ff7]"
               >
                 <option value="public">🌍 Public</option>
@@ -258,17 +374,31 @@ export default function GroupsPage() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5">Category</label>
+              <label className="block text-xs font-bold text-[var(--nx-muted)] uppercase tracking-wider mb-1.5">
+                Category
+              </label>
               <select
                 value={form.category}
-                onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, category: e.target.value }))
+                }
                 className="w-full bg-[var(--nx-surface)] border border-[var(--nx-border)] text-[var(--nx-text)] rounded-xl text-sm px-3.5 py-2.5 focus:outline-none focus:border-[#7c6ff7]"
               >
-                {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c}>{c}</option>)}
+                {CATEGORIES.filter((c) => c !== "All").map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
-          <Button variant="primary" fullWidth loading={creating} disabled={!form.name.trim()} onClick={createGroup}>
+          <Button
+            variant="primary"
+            fullWidth
+            loading={creating}
+            disabled={!form.name.trim()}
+            onClick={createGroup}
+          >
             Create Group
           </Button>
         </div>
