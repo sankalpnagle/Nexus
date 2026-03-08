@@ -9,6 +9,7 @@ import React, {
 import { io, Socket } from "socket.io-client";
 import toast from "react-hot-toast";
 import { useAuth } from "../store/authStore";
+import type { User } from "../types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ export const useSocket = (): SocketContextValue => {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL ?? "http://localhost:5000";
+const SOCKET_URL = process.env.VITE_SOCKET_URL ?? "http://localhost:5000";
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -145,9 +146,27 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
         toast(`🎉 ${name} accepted your friend request`);
     });
 
-    socket.on("friend:request_received", (d) => {
-      console.log("[Socket] friend request received", d);
-    });
+    socket.on(
+      "friend:request_received",
+      (req: { senderId: string; senderData: User; createdAt: string }) => {
+        // Update authStore directly so FriendsPage shows instantly on any tab
+        const { user: current, setUser } = useAuth.getState();
+        if (!current) return;
+        if (current.friendRequests.some((r) => r.from._id === req.senderId))
+          return;
+        setUser({
+          ...current,
+          friendRequests: [
+            ...current.friendRequests,
+            {
+              _id: req.senderId,
+              from: req.senderData,
+              createdAt: req.createdAt,
+            },
+          ],
+        });
+      },
+    );
 
     return () => {
       socket.disconnect();

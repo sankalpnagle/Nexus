@@ -1,74 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { UserCheck, UserX, UserPlus, Users } from 'lucide-react';
-import { User } from '../types';
-import api from '../utils/api';
-import { useAuth } from '../store/authStore';
-import { Avatar, Button, Card, EmptyState, Spinner, Tabs } from '../components/ui';
-import { getAvatar } from '../utils/helpers';
-import toast from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { UserCheck, UserX, UserPlus, Users } from "lucide-react";
+import { User } from "../types";
+import api from "../utils/api";
+import { useAuth } from "../store/authStore";
+import {
+  Avatar,
+  Button,
+  Card,
+  EmptyState,
+  Spinner,
+  Tabs,
+} from "../components/ui";
+import { getAvatar } from "../utils/helpers";
+import toast from "react-hot-toast";
+import { useSocket } from "../context/SocketContext";
 
-type Tab = 'requests' | 'suggestions' | 'all';
+type Tab = "requests" | "suggestions" | "all";
 
 export default function FriendsPage() {
   const { user: me, refreshUser } = useAuth();
+  const { socket } = useSocket();
   const nav = useNavigate();
-  const [tab, setTab] = useState<Tab>('requests');
+  const [tab, setTab] = useState<Tab>("requests");
   const [suggestions, setSuggestions] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Real-time: friend:request_received is handled globally in SocketProvider.
+  // Handle the remaining events that mutate friends/requests lists.
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("friend:request_accepted", refreshUser);
+    socket.on("friend:request_declined", refreshUser);
+    socket.on("friend:removed", refreshUser);
+    socket.on("friends:list_updated", refreshUser);
+    return () => {
+      socket.off("friend:request_accepted", refreshUser);
+      socket.off("friend:request_declined", refreshUser);
+      socket.off("friend:removed", refreshUser);
+      socket.off("friends:list_updated", refreshUser);
+    };
+  }, [socket, refreshUser]);
 
   const requests = me?.friendRequests || [];
   const allFriends = (me?.friends as User[]) || [];
 
   useEffect(() => {
     setLoading(true);
-    api.get('/users/suggestions')
-      .then(r => setSuggestions(r.data.users))
+    api
+      .get("/users/suggestions")
+      .then((r) => setSuggestions(r.data.users))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const respond = async (uid: string, action: 'accept' | 'decline') => {
+  const respond = async (uid: string, action: "accept" | "decline") => {
     try {
       await api.put(`/users/${uid}/friend-request`, { action });
       await refreshUser();
-      toast.success(action === 'accept' ? '✓ Friend added!' : 'Declined');
-    } catch { toast.error('Failed'); }
+      toast.success(action === "accept" ? "✓ Friend added!" : "Declined");
+    } catch {
+      toast.error("Failed");
+    }
   };
 
   const sendReq = async (uid: string) => {
     try {
       await api.post(`/users/${uid}/friend-request`);
-      setSuggestions(p => p.filter(u => u._id !== uid));
-      toast.success('Friend request sent!');
-    } catch { toast.error('Failed'); }
+      setSuggestions((p) => p.filter((u) => u._id !== uid));
+      toast.success("Friend request sent!");
+    } catch {
+      toast.error("Failed");
+    }
   };
 
   const tabs: { key: Tab; label: string; count?: number }[] = [
-    { key: 'requests',    label: 'Requests',    count: requests.length },
-    { key: 'suggestions', label: 'Suggestions' },
-    { key: 'all',         label: 'All Friends', count: allFriends.length },
+    { key: "requests", label: "Requests", count: requests.length },
+    { key: "suggestions", label: "Suggestions" },
+    { key: "all", label: "All Friends", count: allFriends.length },
   ];
 
   return (
     <div className="max-w-[1000px] mx-auto px-4 py-5">
       <div className="flex items-center justify-between mb-5">
-        <h1 className="text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">Friends</h1>
+        <h1 className="text-2xl font-black text-[var(--nx-heading)] font-[var(--font-display)] tracking-tight">
+          Friends
+        </h1>
       </div>
 
-      <Tabs tabs={tabs} active={tab} onChange={setTab} className="mb-5 max-w-sm" />
+      <Tabs
+        tabs={tabs}
+        active={tab}
+        onChange={setTab}
+        className="mb-5 max-w-sm"
+      />
 
       {loading ? (
-        <div className="flex justify-center py-16"><Spinner size={36} /></div>
+        <div className="flex justify-center py-16">
+          <Spinner size={36} />
+        </div>
       ) : (
         <>
           {/* Requests */}
-          {tab === 'requests' && (
-            requests.length === 0 ? (
-              <EmptyState icon={<Users size={28} />} title="No pending requests" subtitle="When someone sends you a request, it'll appear here" />
+          {tab === "requests" &&
+            (requests.length === 0 ? (
+              <EmptyState
+                icon={<Users size={28} />}
+                title="No pending requests"
+                subtitle="When someone sends you a request, it'll appear here"
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {requests.map(req => (
+                {requests.map((req) => (
                   <Card key={req._id} className="p-4">
                     <div
                       className="flex items-center gap-3 mb-3 cursor-pointer group"
@@ -79,30 +122,48 @@ export default function FriendsPage() {
                         <p className="font-bold text-[var(--nx-heading)] text-sm font-[var(--font-display)] group-hover:text-[#7c6ff7] transition-colors">
                           {req.from.firstName} {req.from.lastName}
                         </p>
-                        <p className="text-xs text-[var(--nx-muted)]">{(req.from.friends as string[])?.length || 0} mutual friends</p>
+                        <p className="text-xs text-[var(--nx-muted)]">
+                          {(req.from.friends as string[])?.length || 0} mutual
+                          friends
+                        </p>
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="primary" fullWidth size="sm" icon={<UserCheck size={13} />} onClick={() => respond(req.from._id, 'accept')}>
+                      <Button
+                        variant="primary"
+                        fullWidth
+                        size="sm"
+                        icon={<UserCheck size={13} />}
+                        onClick={() => respond(req.from._id, "accept")}
+                      >
                         Confirm
                       </Button>
-                      <Button variant="secondary" fullWidth size="sm" icon={<UserX size={13} />} onClick={() => respond(req.from._id, 'decline')}>
+                      <Button
+                        variant="secondary"
+                        fullWidth
+                        size="sm"
+                        icon={<UserX size={13} />}
+                        onClick={() => respond(req.from._id, "decline")}
+                      >
                         Delete
                       </Button>
                     </div>
                   </Card>
                 ))}
               </div>
-            )
-          )}
+            ))}
 
           {/* Suggestions */}
-          {tab === 'suggestions' && (
-            suggestions.length === 0 ? (
-              <EmptyState icon={<Users size={28} />} title="No suggestions right now" subtitle="Check back later as new people join Nexus" />
+          {tab === "suggestions" &&
+            (suggestions.length === 0 ? (
+              <EmptyState
+                icon={<Users size={28} />}
+                title="No suggestions right now"
+                subtitle="Check back later as new people join Nexus"
+              />
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                {suggestions.map(u => (
+                {suggestions.map((u) => (
                   <Card key={u._id} className="overflow-hidden group">
                     <img
                       src={getAvatar(u, 200)}
@@ -117,24 +178,35 @@ export default function FriendsPage() {
                       >
                         {u.firstName} {u.lastName}
                       </p>
-                      <p className="text-xs text-[var(--nx-muted)] mb-2.5">{(u.friends as string[])?.length || 0} mutual friends</p>
-                      <Button variant="primary" fullWidth size="xs" icon={<UserPlus size={12} />} onClick={() => sendReq(u._id)}>
+                      <p className="text-xs text-[var(--nx-muted)] mb-2.5">
+                        {(u.friends as string[])?.length || 0} mutual friends
+                      </p>
+                      <Button
+                        variant="primary"
+                        fullWidth
+                        size="xs"
+                        icon={<UserPlus size={12} />}
+                        onClick={() => sendReq(u._id)}
+                      >
                         Add Friend
                       </Button>
                     </div>
                   </Card>
                 ))}
               </div>
-            )
-          )}
+            ))}
 
           {/* All friends */}
-          {tab === 'all' && (
-            allFriends.length === 0 ? (
-              <EmptyState icon={<Users size={28} />} title="No friends yet" subtitle="Send friend requests to get started" />
+          {tab === "all" &&
+            (allFriends.length === 0 ? (
+              <EmptyState
+                icon={<Users size={28} />}
+                title="No friends yet"
+                subtitle="Send friend requests to get started"
+              />
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                {allFriends.map(f => (
+                {allFriends.map((f) => (
                   <Card key={(f as User)._id} className="overflow-hidden group">
                     <img
                       src={getAvatar(f as User, 200)}
@@ -149,15 +221,20 @@ export default function FriendsPage() {
                       >
                         {(f as User).firstName} {(f as User).lastName}
                       </p>
-                      <Button variant="ghost" fullWidth size="xs" className="mt-2" onClick={() => nav(`/profile/${(f as User)._id}`)}>
+                      <Button
+                        variant="ghost"
+                        fullWidth
+                        size="xs"
+                        className="mt-2"
+                        onClick={() => nav(`/profile/${(f as User)._id}`)}
+                      >
                         View Profile
                       </Button>
                     </div>
                   </Card>
                 ))}
               </div>
-            )
-          )}
+            ))}
         </>
       )}
     </div>
