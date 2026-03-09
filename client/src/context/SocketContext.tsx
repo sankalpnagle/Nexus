@@ -80,11 +80,9 @@ export const useSocket = (): SocketContextValue => {
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
-const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ??
-  (import.meta.env.PROD
-    ? "http://13.233.84.226:5000"
-    : "http://localhost:5000");
+const SOCKET_URL = import.meta.env.PROD
+  ? window.location.origin
+  : (import.meta.env.VITE_SOCKET_URL ?? "http://localhost:5000");
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

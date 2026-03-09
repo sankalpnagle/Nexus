@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL ??
-  (import.meta.env.PROD ? "http://13.233.84.226:5000/api" : "/api");
+const API_BASE_URL = import.meta.env.PROD
+  ? "/api"
+  : (import.meta.env.VITE_API_URL ?? "/api");
 
 const api = axios.create({ baseURL: API_BASE_URL });
 
