@@ -1,7 +1,7 @@
 import express from "express";
 import http from "http";
 import { Server } from "socket.io";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
@@ -13,13 +13,17 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
+const openCorsOptions: CorsOptions = {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
 // ── Socket.IO ─────────────────────────────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL ?? "http://localhost:5173",
-    methods: ["GET", "POST"],
-    credentials: true,
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   },
   pingTimeout: 60000,
   pingInterval: 25000,
@@ -29,12 +33,8 @@ initSocket(io); // register all event handlers
 registerIOForEmitter(io); // allow controllers to emit events
 
 // ── Middleware ────────────────────────────────────────────────────────────────
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL ?? "http://localhost:5173",
-    credentials: true,
-  }),
-);
+app.use(cors(openCorsOptions));
+app.options("*", cors(openCorsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
