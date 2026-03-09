@@ -32,8 +32,9 @@ jobs:
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
           nvm use 22.12.0
-          cd ~/github-pipeline-ts
+          cd ~/nexus
           git pull origin main
+          cd server
           npm ci
           npm run build
           pm2 restart nexus-api
