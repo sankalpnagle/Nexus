@@ -215,7 +215,6 @@ export default function Navbar() {
                   setQ("");
                 }}
                 className="flex items-center gap-3 px-4 py-2.5 cursor-pointer transition-colors"
-                style={{ ":hover": { background: "var(--nx-card)" } }}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.background = "var(--nx-card)")
                 }

@@ -47,7 +47,9 @@ export default function MessagesPage() {
   const [showPanel, setShowPanel] = useState<"list" | "chat">("list");
   const endRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const typingRef = useRef<ReturnType<typeof setTimeout>>();
+  const typingRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     fetchConvs();
@@ -266,7 +268,9 @@ export default function MessagesPage() {
                 <Avatar
                   user={f as User}
                   size={38}
-                  online={onlineUsers.has((f as User)._id) || (f as User).isOnline}
+                  online={
+                    onlineUsers.has((f as User)._id) || (f as User).isOnline
+                  }
                 />
                 <p className="text-sm font-semibold text-[var(--nx-text)]">
                   {(f as User).firstName} {(f as User).lastName}

@@ -110,7 +110,7 @@ export const sendFriendRequest = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params as { userId: string };
     const me = req.user!;
     if (userId === me._id.toString()) {
       res.status(400).json({ success: false, message: "Cannot add yourself" });
@@ -168,7 +168,7 @@ export const respondFriendRequest = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params as { userId: string };
     const { action } = req.body;
     const me = req.user!;
     if (action === "accept") {
@@ -233,7 +233,7 @@ export const unfriend = async (
 ): Promise<void> => {
   try {
     const removerId = req.user?._id.toString()!;
-    const removedId = req.params.userId;
+    const removedId = req.params.userId as string;
     await User.findByIdAndUpdate(removerId, { $pull: { friends: removedId } });
     await User.findByIdAndUpdate(removedId, { $pull: { friends: removerId } });
     emitEvent("friend:removed", { removerId }, removedId);
