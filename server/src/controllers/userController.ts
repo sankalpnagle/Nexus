@@ -60,6 +60,7 @@ export const updateProfile = async (
     });
     res.json({ success: true, user });
   } catch (e) {
+    console.error("[updateProfile] Error:", e);
     res.status(500).json({ success: false, error: String(e) });
   }
 };
