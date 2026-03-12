@@ -7,6 +7,10 @@
     {
       "source": "/socket.io/:path*",
       "destination": "http://13.233.84.226:5000/socket.io/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
