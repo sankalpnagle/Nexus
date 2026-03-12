@@ -37,7 +37,10 @@ export default function MessagesPage() {
   const [selected, setSelected] = useState<Conversation | null>(null);
   const [msgs, setMsgs] = useState<Message[]>([]);
   const [text, setText] = useState("");
-  const [typingUser, setTypingUser] = useState<string | null>(null);
+  const [typingUser, setTypingUser] = useState<{
+    name: string;
+    userId: string;
+  } | null>(null);
   const [searchQ, setSearchQ] = useState("");
   const [friends, setFriends] = useState<User[]>([]);
   const [showGroup, setShowGroup] = useState(false);
@@ -79,8 +82,13 @@ export default function MessagesPage() {
       setMsgs((p) => [...p, m]);
       fetchConvs();
     };
-    const handleTypingStart = (d: { userId: string; name: string }) => {
-      if (d.userId !== me?._id) setTypingUser(d.name);
+    const handleTypingStart = (d: {
+      conversationId: string;
+      userId: string;
+      name: string;
+    }) => {
+      if (d.userId !== me?._id)
+        setTypingUser({ name: d.name, userId: d.userId });
     };
     const handleTypingStop = () => setTypingUser(null);
     socket?.on("message:receive", handleMsg);
@@ -213,7 +221,7 @@ export default function MessagesPage() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-56px)] max-w-[1100px] mx-auto border-x border-[var(--nx-border)]">
+    <div className="flex h-[calc(100vh-120px)] md:h-[calc(100vh-56px)] max-w-[1100px] mx-auto border-x border-[var(--nx-border)]">
       {/* Conversation list */}
       <div
         className={cx(
@@ -332,8 +340,16 @@ export default function MessagesPage() {
                     )}
                   </div>
                   {c.lastMessage && (
-                    <p className="text-xs text-[var(--nx-muted)] truncate mt-0.5">
-                      {(c.lastMessage as Message).content || "📎 Media"}
+                    <p className="text-xs truncate mt-0.5">
+                      {selected?._id === c._id && typingUser ? (
+                        <span className="text-[#7c6ff7] font-medium">
+                          typing…
+                        </span>
+                      ) : (
+                        <span className="text-[var(--nx-muted)]">
+                          {(c.lastMessage as Message).content || "📎 Media"}
+                        </span>
+                      )}
                     </p>
                   )}
                 </div>
@@ -377,11 +393,26 @@ export default function MessagesPage() {
                   <p className="font-bold text-[var(--nx-heading)] text-sm font-[var(--font-display)]">
                     {convName(selected)}
                   </p>
-                  <p className="text-xs text-[var(--nx-muted)]">
-                    {isOnlineConv(selected) ? (
+                  <p className="text-xs">
+                    {typingUser ? (
+                      <span className="text-[#7c6ff7] flex items-center gap-1">
+                        <span className="inline-flex gap-[3px] items-center">
+                          {[0, 1, 2].map((i) => (
+                            <span
+                              key={i}
+                              className="w-1 h-1 rounded-full bg-[#7c6ff7]"
+                              style={{
+                                animation: `dot-bounce 1.2s ${i * 0.2}s infinite ease-in-out`,
+                              }}
+                            />
+                          ))}
+                        </span>
+                        typing…
+                      </span>
+                    ) : isOnlineConv(selected) ? (
                       <span className="text-[#10d98a]">● Active now</span>
                     ) : (
-                      "Offline"
+                      <span className="text-[var(--nx-muted)]">Offline</span>
                     )}
                   </p>
                 </div>
@@ -483,21 +514,42 @@ export default function MessagesPage() {
 
               {/* Typing indicator */}
               {typingUser && (
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="bg-[var(--nx-border)] rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1 items-center">
-                    {[0, 1, 2].map((i) => (
-                      <span
-                        key={i}
-                        className="w-1.5 h-1.5 rounded-full bg-[var(--nx-muted)]"
-                        style={{
-                          animation: `dot-bounce 1.2s ${i * 0.2}s infinite ease-in-out`,
-                        }}
-                      />
-                    ))}
+                <div className="flex items-end gap-2 mt-2 animate-fade-in">
+                  <img
+                    src={getAvatar(
+                      selected?.participants.find(
+                        (p) => p._id === typingUser.userId,
+                      ),
+                      48,
+                    )}
+                    alt=""
+                    className="w-7 h-7 rounded-full object-cover shrink-0 mb-0.5"
+                  />
+                  <div className="flex flex-col gap-0.5 items-start">
+                    {selected?.isGroup && (
+                      <p className="text-[10px] text-[var(--nx-muted)] px-1">
+                        {typingUser.name}
+                      </p>
+                    )}
+                    <div
+                      className="px-4 py-3 flex gap-1 items-center"
+                      style={{
+                        background: "var(--nx-msg-bg)",
+                        borderRadius: "16px 16px 16px 4px",
+                      }}
+                    >
+                      {[0, 1, 2].map((i) => (
+                        <span
+                          key={i}
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{
+                            background: "var(--nx-muted)",
+                            animation: `dot-bounce 1.2s ${i * 0.2}s infinite ease-in-out`,
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-xs text-[var(--nx-muted)]">
-                    {typingUser} is typing…
-                  </span>
                 </div>
               )}
               <div ref={endRef} />

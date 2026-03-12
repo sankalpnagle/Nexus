@@ -168,7 +168,7 @@ export default function Navbar() {
       {/* Search */}
       <div ref={searchRef} className="relative ml-1">
         <div
-          className="flex items-center rounded-full px-3 py-2 gap-2 w-48 transition-all"
+          className="flex items-center rounded-full px-3 py-2 gap-2 w-32 sm:w-48 transition-all"
           style={{ background: "var(--nx-card)", border: `1px solid ${B}` }}
           onFocus={() => {}}
         >
@@ -237,8 +237,8 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Nav tabs — center */}
-      <nav className="flex-1 flex items-center justify-center gap-x-4 gap-y-1">
+      {/* Nav tabs — center (desktop only) */}
+      <nav className="flex-1 hidden md:flex items-center justify-center gap-x-4 gap-y-1">
         {navLinks.map(({ to, icon: Icon, label }) => {
           const active =
             to === "/" ? loc.pathname === "/" : loc.pathname.startsWith(to);

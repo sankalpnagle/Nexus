@@ -10,6 +10,7 @@ import { Toaster } from "react-hot-toast";
 import { useAuth } from "./store/authStore";
 import { SocketProvider } from "./context/SocketContext";
 import Navbar from "./components/layout/Navbar";
+import MobileNav from "./components/layout/MobileNav";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import ProfilePage from "./pages/ProfilePage";
@@ -24,9 +25,10 @@ function AppLayout() {
   return (
     <div className="min-h-screen bg-[var(--nx-bg)]">
       <Navbar />
-      <div className="pt-14">
+      <div className="pt-14 pb-16 lg:pb-0">
         <Outlet />
       </div>
+      <MobileNav />
     </div>
   );
 }
