@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      "/api": { target: "http://13.233.84.226:5000", changeOrigin: true },
+      "/api": { target: "https://nexus-62ih.onrender.com", changeOrigin: true },
       "/socket.io": {
-        target: "http://13.233.84.226:5000",
+        target: "https://nexus-62ih.onrender.com",
         ws: true,
         changeOrigin: true,
       },
